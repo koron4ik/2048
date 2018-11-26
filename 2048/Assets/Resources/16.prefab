@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 224401239657573160}
   - component: {fileID: 222762668259106504}
   - component: {fileID: 114883499084972662}
+  - component: {fileID: 114295004764810026}
   m_Layer: 5
   m_Name: 16
   m_TagString: Untagged
@@ -45,6 +46,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &114295004764810026
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1354721763524522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a518e08289a83465a8d5eaa06cbbccad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rowIndex: 2
+  columnIndex: 0
+  number: 16
+  isEmpty: 0
 --- !u!114 &114641446200309864
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -134,7 +150,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

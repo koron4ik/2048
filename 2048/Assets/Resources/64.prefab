@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 224215624930342022}
   - component: {fileID: 222322573242796846}
   - component: {fileID: 114147647707018804}
+  - component: {fileID: 114950199412359296}
   m_Layer: 5
   m_Name: 64
   m_TagString: Untagged
@@ -105,6 +106,21 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 64
+--- !u!114 &114950199412359296
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1773670824170414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a518e08289a83465a8d5eaa06cbbccad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rowIndex: 3
+  columnIndex: 1
+  number: 64
+  isEmpty: 0
 --- !u!222 &222322573242796846
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -134,7 +150,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
