@@ -57,11 +57,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a518e08289a83465a8d5eaa06cbbccad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rowIndex: 1
-  columnIndex: 2
   number: 4
+  row: 3
+  column: 1
   isEmpty: 0
-  isMerged: 1
+  isMerged: 0
 --- !u!114 &114143250798387744
 MonoBehaviour:
   m_ObjectHideFlags: 1

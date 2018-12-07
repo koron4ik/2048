@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class GameField : MonoBehaviour 
 {
-
     public Tile emptyTile;
     public Tile[] emptyTiles;
 
-    private void Awake()
+    void Awake()
     {
-        emptyTile = Resources.Load<Tile>("EmptyTile");
+        emptyTile = Resources.Load<Tile>("0");
         emptyTiles = new Tile[16];
 
         FillFieldWithEmptyTiles();
     }
 
-    private void FillFieldWithEmptyTiles()
+    void FillFieldWithEmptyTiles()
     {
         for (int i = 0; i < 16; i++)
         {

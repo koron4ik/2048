@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 114713691119056304}
   - component: {fileID: 114931919333908880}
   m_Layer: 5
-  m_Name: EmptyTile
+  m_Name: 0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,10 +67,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a518e08289a83465a8d5eaa06cbbccad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rowIndex: 0
-  columnIndex: 0
   number: 0
+  row: 3
+  column: 0
   isEmpty: 1
+  isMerged: 0
 --- !u!222 &222883149006232580
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -92,7 +93,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

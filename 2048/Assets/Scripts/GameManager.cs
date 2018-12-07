@@ -11,16 +11,45 @@ public enum Direction
     DOWN
 }
 
+public class LastMove
+{
+    public Tile[,] tiles;
+    public int score;
+
+    public LastMove(Tile[,] tiles, int score)
+    {
+        this.tiles = tiles;
+        this.score = score;
+    }
+}
+
 public class GameManager : MonoBehaviour
 {
-    public GameField gameField;
-    public Tile[] tiles;
+    GameField gameField;
+
+    Tile[,] tiles;
+    List<Tile> emptyTiles;
+    LastMove lastMove;
+
     public float delay;
+
+    int rowCount = 4;
+    int columnCount = 4;
 
     void Awake()
     {
         gameField = GetComponentInChildren<GameField>();
-        tiles = new Tile[16];
+        tiles = new Tile[4,4];
+        emptyTiles = new List<Tile>();
+
+        FillTiles();
+    }
+
+    void FillTiles()
+    {
+        for (int i = 0; i < rowCount; i++)
+            for (int j = 0; j < columnCount; j++)
+                AddNewTile(0, i, j);
     }
 
     void Start()
@@ -34,70 +63,43 @@ public class GameManager : MonoBehaviour
         ReadInput();
     }
 
-    int[] GetEmptyTilesIndexes()
+    void UpdateEmptyTiles()
     {
-        List<int> numbers = new List<int>();
-
-        for (int i = 0; i < tiles.Length; i++)
-        {
-            if (tiles[i] == null)
-            {
-                numbers.Add(i);
-            }
-        }
-
-        return numbers.ToArray();
-    }
-
-    void AddNewTile(int number, int index)
-    {
-        Tile tile = Resources.Load<Tile>(number.ToString());
-
-        RectTransform rectTransform = tile.GetComponent<RectTransform>();
-        rectTransform.anchorMin = new Vector2(0.0f, 0.0f);
-        rectTransform.anchorMax = new Vector2(1.0f, 1.0f);
-        rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        tile.transform.localPosition = Vector3.zero;
-
-        tile.number = number;
-
-        tiles[index] = Instantiate(tile, gameField.emptyTiles[index].transform.position, Quaternion.identity, gameField.emptyTiles[index].transform);
-    }
-
-    void MoveTile(int curIndex, int newIndex)
-    {
-        tiles[newIndex] = Instantiate(tiles[curIndex], gameField.emptyTiles[newIndex].transform.position, Quaternion.identity, gameField.emptyTiles[newIndex].transform);
-        Destroy(tiles[curIndex].gameObject);
-        tiles[curIndex] = null;
+        emptyTiles.Clear();
+        for (int i = 0; i < rowCount; i++)
+            for (int j = 0; j < columnCount; j++)
+                if (tiles[i, j].isEmpty) 
+                    emptyTiles.Add(tiles[i, j]);
     }
 
     void Move(Direction dir)
     {
-        ResetMergeFlags();
+        SaveMove();
+
         for (int i = 0; i < 3; i++)
-        {
             StartCoroutine(MoveCoroutine(dir));
-        }
 
         GenerateDefaultTile();
+        ResetMergeFlags();
     }
 
     void GenerateDefaultTile()
     {
-        int[] emptyTilesIndexes = GetEmptyTilesIndexes();
-        int newTileIndex = Random.Range(0, emptyTilesIndexes.Length);
-        AddNewTile(2, emptyTilesIndexes[newTileIndex]);
+        UpdateEmptyTiles();
+        int newTileIndex = Random.Range(0, emptyTiles.Count);
+        AddNewTile(2, emptyTiles[newTileIndex].row, emptyTiles[newTileIndex].column);
     }
 
     void ResetMergeFlags()
     {
         foreach (Tile tile in tiles)
-        {
             if (tile != null)
-            {
                 tile.isMerged = false;
-            }
-        }
+    }
+
+    public void SaveMove()
+    {
+        lastMove = new LastMove((Tile[,])tiles.Clone(), Score.Instance.score);
     }
 
     IEnumerator MoveCoroutine(Direction dir)
@@ -122,142 +124,166 @@ public class GameManager : MonoBehaviour
 
     void ReadInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
+        if (Input.GetKeyDown(KeyCode.LeftArrow) && CanMoveLeft())
             Move(Direction.LEFT);
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
+        else if (Input.GetKeyDown(KeyCode.RightArrow) && CanMoveRight())
             Move(Direction.RIGHT);
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
+        else if (Input.GetKeyDown(KeyCode.UpArrow) && CanMoveUp())
             Move(Direction.UP);
-        }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
+        else if (Input.GetKeyDown(KeyCode.DownArrow) && CanMoveDown())
             Move(Direction.DOWN);
-        }
-    }
-
-    IEnumerator MoveTilesDown()
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            for (int i = 2; i >= 0; i--)
-            {
-                int curIndex = i * 4 + j;
-                int newIndex = (i + 1) * 4 + j;
-
-                if (tiles[curIndex] != null)
-                {
-                    if (CanMove(newIndex))
-                    {
-                        MoveTile(curIndex, newIndex);
-                    }
-                    else if (CanMerge(curIndex, newIndex))
-                    {
-                        MergeTwoTiles(curIndex, newIndex);
-                    }
-                }
-            }
-        }
-        yield return new WaitForSeconds(delay);
     }
 
     IEnumerator MoveTilesUp()
     {
         for (int j = 0; j < 4; j++)
-        {
             for (int i = 1; i <= 3; i++)
-            {
-                int curIndex = i * 4 + j;
-                int newIndex = (i - 1) * 4 + j;
+                Moving(tiles[i, j], tiles[i - 1, j]);
 
-                if (tiles[curIndex] != null)
-                {
-                    if (CanMove(newIndex))
-                    {
-                        MoveTile(curIndex, newIndex);
-                    }
-                    else if (CanMerge(curIndex, newIndex))
-                    {
-                        MergeTwoTiles(curIndex, newIndex);
-                    }
-                }
-            }
-        }
         yield return new WaitForSeconds(delay);
     }
-    
+
+    IEnumerator MoveTilesDown()
+    {
+        for (int j = 0; j < 4; j++)
+            for (int i = 2; i >= 0; i--)
+                Moving(tiles[i, j], tiles[i + 1, j]);
+
+        yield return new WaitForSeconds(delay);
+    }
+
     IEnumerator MoveTilesRight()
     {
         for (int i = 0; i < 4; i++)
-        {
             for (int j = 2; j >= 0; j--)
-            {
-                int curIndex = i * 4 + j;
-                int newIndex = i * 4 + j + 1;
-
-                if (tiles[curIndex] != null)
-                {
-                    if (CanMove(newIndex))
-                    {
-                        MoveTile(curIndex, newIndex);
-                    }
-                    else if (CanMerge(curIndex, newIndex))
-                    {
-                        MergeTwoTiles(curIndex, newIndex);
-                    }
-                }
-            }
-        }
+                Moving(tiles[i, j], tiles[i, j + 1]);
+ 
         yield return new WaitForSeconds(delay);
     }
 
     IEnumerator MoveTilesLeft()
     {
         for (int i = 0; i < 4; i++)
-        {
             for (int j = 1; j <= 3; j++)
-            {
-                int curIndex = i * 4 + j;
-                int newIndex = i * 4 + j - 1;
+                Moving(tiles[i, j], tiles[i, j - 1]);
 
-                if (tiles[curIndex] != null)
-                {
-                    if (CanMove(newIndex))
-                    {
-                        MoveTile(curIndex, newIndex);
-                    }
-                    else if (CanMerge(curIndex, newIndex))
-                    {
-                        MergeTwoTiles(curIndex, newIndex);
-                    }
-                }
-            }
-        }
         yield return new WaitForSeconds(delay);
     }
 
-    void MergeTwoTiles(int curTileIndex, int newTileIndex)
+    bool CanMoveUp()
     {
-        Destroy(tiles[newTileIndex].gameObject);
-        tiles[newTileIndex] = null;
-
-        AddNewTile(tiles[curTileIndex].number * 2, newTileIndex);
-
-        Destroy(tiles[curTileIndex].gameObject);
-        tiles[curTileIndex] = null;
+        for (int j = 0; j < 4; j++)
+            for (int i = 1; i <= 3; i++)
+                if (!tiles[i, j].isEmpty && (tiles[i - 1, j].isEmpty || CanMerge(tiles[i, j], tiles[i - 1, j])))
+                    return true;
+        return false;
     }
 
-    bool CanMove(int index)
+    bool CanMoveDown()
     {
-        return tiles[index] == null;
+        for (int j = 0; j < 4; j++)
+            for (int i = 2; i >= 0; i--)
+                if (!tiles[i, j].isEmpty && (tiles[i + 1, j].isEmpty || CanMerge(tiles[i, j], tiles[i + 1, j])))
+                    return true;
+        return false;
     }
 
-    bool CanMerge(int curTileIndex, int newTileIndex)
+    bool CanMoveRight()
     {
-        return tiles[newTileIndex].number == tiles[curTileIndex].number && !tiles[curTileIndex].isMerged;
+        for (int i = 0; i < 4; i++)
+            for (int j = 2; j >= 0; j--)
+                if (!tiles[i, j].isEmpty && (tiles[i, j + 1].isEmpty || CanMerge(tiles[i, j], tiles[i, j + 1])))
+                    return true;
+        return false;
+    }
+
+    bool CanMoveLeft()
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 1; j <= 3; j++)
+                if (!tiles[i, j].isEmpty && (tiles[i, j - 1].isEmpty || CanMerge(tiles[i, j], tiles[i, j - 1])))
+                    return true;
+        return false;
+    }
+
+    void Moving(Tile curTile, Tile newTile)
+    {
+        if (!curTile.isEmpty)
+        {
+            if (CanMoveTo(newTile))
+                MoveTile(curTile, newTile);
+            else if (CanMerge(curTile, newTile))
+                MergeTwoTiles(curTile, newTile);
+        }
+    }
+
+    void AddNewTile(int number, int row, int column)
+    {
+        Tile tile = Resources.Load<Tile>(number.ToString());
+
+        tile.number = number;
+        tile.row = row;
+        tile.column = column;
+        tile.Transform();
+        tiles[row, column] = Instantiate(tile, 
+                                         gameField.emptyTiles[row * rowCount + column].transform.position, 
+                                         Quaternion.identity, 
+                                         gameField.emptyTiles[row * rowCount + column].transform);
+    }
+
+    void MoveTile(Tile curTile, Tile newTile)
+    {
+        Destroy(curTile.gameObject);
+
+        AddNewTile(0, curTile.row, curTile.column);
+        AddNewTile(curTile.number, newTile.row, newTile.column);
+    }
+
+    void MergeTwoTiles(Tile curTile, Tile newTile)
+    {
+        Destroy(newTile.gameObject);
+        Destroy(curTile.gameObject);
+
+        AddNewTile(0, curTile.row, curTile.column);
+        AddNewTile(curTile.number * 2, newTile.row, newTile.column);
+        tiles[newTile.row, newTile.column].isMerged = true;
+
+        Score.Instance.AddScore(tiles[newTile.row, newTile.column].number);
+    }
+
+    bool CanMoveTo(Tile tile)
+    {
+        return tile.isEmpty;
+    }
+
+    bool CanMerge(Tile curTile, Tile newTile)
+    {
+        return curTile.number == newTile.number && !curTile.isMerged;
+    }
+
+    public void NewGameButtonPressed()
+    {
+
+    }
+
+    public void UndoButtonPressed()
+    {
+        UpdateUI();
+    }
+
+    void UpdateUI()
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                Destroy(tiles[i, j].gameObject);
+
+        FillTiles();
+        tiles = lastMove.tiles;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                AddNewTile(tiles[i, j].number, tiles[i, j].row, tiles[i, j].column);
+
+        Score.Instance.score = lastMove.score;
+        Score.Instance.scoreText.text = lastMove.score.ToString();
     }
 }
