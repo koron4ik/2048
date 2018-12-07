@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum Direction
 {
@@ -263,7 +263,7 @@ public class GameManager : MonoBehaviour
 
     public void NewGameButtonPressed()
     {
-
+        SceneManager.LoadScene("SampleScene");
     }
 
     public void UndoButtonPressed()

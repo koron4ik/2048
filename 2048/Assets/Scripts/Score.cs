@@ -20,6 +20,7 @@ public class Score : MonoBehaviour {
 
         if (!PlayerPrefs.HasKey("HighScore"))
             PlayerPrefs.SetInt("HighScore", 0);
+        else highScore = PlayerPrefs.GetInt("HighScore");
 
         scoreText = GameObject.Find("ScoreValue").GetComponent<Text>();
         highScoreText = GameObject.Find("HighScoreValue").GetComponent<Text>();
@@ -31,8 +32,8 @@ public class Score : MonoBehaviour {
     public void AddScore(int value)
     {
         score += value;
-
         scoreText.text = score.ToString();
+
         if (score > highScore)
         {
             highScore = score;
