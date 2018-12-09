@@ -1354,7 +1354,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32f17ffaba17a4bb09ce7dd195146cc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delay: 0.1
   gameOverPanel: {fileID: 1246781053}
   winPanel: {fileID: 751221012}
 --- !u!1 &867591232

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class Score : MonoBehaviour {
@@ -13,7 +11,6 @@ public class Score : MonoBehaviour {
 
     public static Score Instance;
 
-    // Use this for initialization
     void Start () 
     {
         Instance = this;

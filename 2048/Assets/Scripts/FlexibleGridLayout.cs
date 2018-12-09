@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class FlexibleGridLayout : GridLayoutGroup
 {
-    int ColumnCount = 4;
-    int RowCount = 4;
+    readonly int ColumnCount = 4;
+    readonly int RowCount = 4;
 
     public override void SetLayoutHorizontal()
     {

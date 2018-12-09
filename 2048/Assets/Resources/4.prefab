@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 222010283746571412}
   - component: {fileID: 114143250798387744}
   - component: {fileID: 114071840124532314}
+  - component: {fileID: 111121214322070772}
   m_Layer: 5
   m_Name: 4
   m_TagString: Untagged
@@ -46,6 +47,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!111 &111121214322070772
+Animation:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1651337302208998}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: 75a19868c001942e588560c49fb05042, type: 2}
+  - {fileID: 7400000, guid: d6fca7eef11a044338cafb9a6d559fe6, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!114 &114071840124532314
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -57,8 +74,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a518e08289a83465a8d5eaa06cbbccad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  anim: {fileID: 0}
   number: 4
-  row: 3
+  row: 0
   column: 1
   isEmpty: 0
   isMerged: 0

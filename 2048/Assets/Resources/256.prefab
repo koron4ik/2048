@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 222569399377439362}
   - component: {fileID: 114738823462783264}
   - component: {fileID: 114339763280156146}
+  - component: {fileID: 111812164960539126}
   m_Layer: 5
   m_Name: 256
   m_TagString: Untagged
@@ -46,6 +47,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!111 &111812164960539126
+Animation:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1490707577779858}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: 75a19868c001942e588560c49fb05042, type: 2}
+  - {fileID: 7400000, guid: d6fca7eef11a044338cafb9a6d559fe6, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!114 &114181037480318946
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -90,10 +107,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a518e08289a83465a8d5eaa06cbbccad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rowIndex: 3
-  columnIndex: 1
+  anim: {fileID: 0}
   number: 256
+  row: 0
+  column: 0
   isEmpty: 0
+  isMerged: 0
 --- !u!114 &114738823462783264
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,16 +16,10 @@ public enum State
     Pause
 }
 
-public class LastMove
+public struct LastMove
 {
-    public Tile[,] tiles;
-    public int score;
-
-    public LastMove(Tile[,] tiles, int score)
-    {
-        this.tiles = tiles;
-        this.score = score;
-    }
+    public static Tile[,] tiles;
+    public static int score;
 }
 
 public class GameManager : MonoBehaviour
@@ -34,15 +27,11 @@ public class GameManager : MonoBehaviour
     GameField gameField;
 
     Tile[,] tiles;
-    List<Tile> emptyTiles;
-    LastMove lastMove;
     State state;
 
     bool won;
     bool returned = true;
-
-    public float delay;
-
+    
     public GameObject gameOverPanel;
     public GameObject winPanel;
 
@@ -53,7 +42,6 @@ public class GameManager : MonoBehaviour
     {
         gameField = GetComponentInChildren<GameField>();
         tiles = new Tile[4,4];
-        emptyTiles = new List<Tile>();
         state = State.Playing;
 
         FillTiles();
@@ -68,8 +56,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        GenerateDefaultTile();
-        GenerateDefaultTile();
+        GenerateRandomTile();
+        GenerateRandomTile();
     }
 
     void Update()
@@ -77,13 +65,16 @@ public class GameManager : MonoBehaviour
         ReadInput();
     }
 
-    void UpdateEmptyTiles()
+    List<Tile> GetEmptyTiles()
     {
-        emptyTiles.Clear();
+        List<Tile> emptyTiles = new List<Tile>();
+
         for (int i = 0; i < rowCount; i++)
             for (int j = 0; j < columnCount; j++)
                 if (tiles[i, j].isEmpty) 
                     emptyTiles.Add(tiles[i, j]);
+
+        return emptyTiles;
     }
 
     void Move(Direction dir)
@@ -91,9 +82,9 @@ public class GameManager : MonoBehaviour
         SaveMove();
 
         for (int i = 0; i < 3; i++)
-            StartCoroutine(MoveCoroutine(dir));
+            MoveTiles(dir);
 
-        GenerateDefaultTile();
+        GenerateRandomTile();
         ResetMergeFlags();
 
         if (Win() && !won)
@@ -122,11 +113,12 @@ public class GameManager : MonoBehaviour
         return !(CanMove(Direction.UP) || CanMove(Direction.DOWN) || CanMove(Direction.LEFT) || CanMove(Direction.RIGHT));
     }
 
-    void GenerateDefaultTile()
+    void GenerateRandomTile()
     {
-        UpdateEmptyTiles();
+        List<Tile> emptyTiles = GetEmptyTiles();
         int newTileIndex = Random.Range(0, emptyTiles.Count);
-        AddNewTile(2, emptyTiles[newTileIndex].row, emptyTiles[newTileIndex].column);
+        AddNewTile(Random.Range(0, 10) % 10 == 0 ? 4 : 2, emptyTiles[newTileIndex].row, emptyTiles[newTileIndex].column);
+        tiles[emptyTiles[newTileIndex].row, emptyTiles[newTileIndex].column].PlayAppearAnimation();
     }
 
     void ResetMergeFlags()
@@ -138,13 +130,8 @@ public class GameManager : MonoBehaviour
 
     void SaveMove()
     {
-        lastMove = new LastMove((Tile[,])tiles.Clone(), Score.Instance.score);
-    }
-
-    IEnumerator MoveCoroutine(Direction dir)
-    {
-        StartCoroutine(MoveTiles(dir));
-        yield return null;
+        LastMove.score = Score.Instance.score;
+        LastMove.tiles = (Tile[,])tiles.Clone();
     }
 
     void ReadInput()
@@ -162,7 +149,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator MoveTiles(Direction dir)
+    void MoveTiles(Direction dir)
     {
         switch (dir)
         {
@@ -187,7 +174,6 @@ public class GameManager : MonoBehaviour
                         Moving(tiles[i, j], tiles[i + 1, j]);
                 break;
         }
-        yield return new WaitForSeconds(delay);
     }
 
     bool CanMove(Direction dir)
@@ -226,7 +212,7 @@ public class GameManager : MonoBehaviour
     {
         if (!curTile.isEmpty)
         {
-            if (CanMoveTo(newTile))
+            if (newTile.isEmpty)
                 MoveTile(curTile, newTile);
             else if (CanMerge(curTile, newTile))
                 MergeTwoTiles(curTile, newTile);
@@ -236,11 +222,9 @@ public class GameManager : MonoBehaviour
     void AddNewTile(int number, int row, int column)
     {
         Tile tile = Resources.Load<Tile>(number.ToString());
-
-        tile.number = number;
-        tile.row = row;
-        tile.column = column;
+        tile.Setup(number, row, column);
         tile.Transform();
+
         tiles[row, column] = Instantiate(tile, 
                                          gameField.emptyTiles[row * rowCount + column].transform.position, 
                                          Quaternion.identity, 
@@ -263,13 +247,9 @@ public class GameManager : MonoBehaviour
         AddNewTile(0, curTile.row, curTile.column);
         AddNewTile(curTile.number * 2, newTile.row, newTile.column);
         tiles[newTile.row, newTile.column].isMerged = true;
+        tiles[newTile.row, newTile.column].PlayMergeAnimation();
 
         Score.Instance.AddScore(tiles[newTile.row, newTile.column].number);
-    }
-
-    bool CanMoveTo(Tile tile)
-    {
-        return tile.isEmpty;
     }
 
     bool CanMerge(Tile curTile, Tile newTile)
@@ -289,7 +269,7 @@ public class GameManager : MonoBehaviour
 
     public void UndoButtonPressed()
     {
-        if (!returned)
+        if (!returned && state == State.Playing)
         {
             UpdateUI();
             returned = true;
@@ -303,12 +283,12 @@ public class GameManager : MonoBehaviour
                 Destroy(tiles[i, j].gameObject);
 
         FillTiles();
-        tiles = lastMove.tiles;
+        tiles = LastMove.tiles;
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 AddNewTile(tiles[i, j].number, tiles[i, j].row, tiles[i, j].column);
 
-        Score.Instance.score = lastMove.score;
-        Score.Instance.scoreText.text = lastMove.score.ToString();
+        Score.Instance.score = LastMove.score;
+        Score.Instance.scoreText.text = LastMove.score.ToString();
     }
 }
